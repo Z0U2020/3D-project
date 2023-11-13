@@ -3,18 +3,20 @@
 #include <glfw3.h>
 #include <iostream>
 #include <vector>
-#include <cmath>
+#include "external/glut-3.7/include/GL/glut.h"
+
+const int _DEPTH = 8;
 
 // Vertex shader source code
 const char* vertexShaderSource = R"(
 #version 330 core
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in vec2 aPos;
 out vec3 vertexColor;
 
 uniform float iTime; // Time uniform variable
 
 void main() {
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = vec4(aPos, 0.0, 1.0);
 
     // Modify colors using sine and cosine functions based on iTime
     float r = 0.5 + 0.5 * sin(iTime);
@@ -41,29 +43,30 @@ std::vector<float> sierpinskiVertices;
 
 // Function to generate Sierpinski triangle
 
-void generateSierpinski(std::vector<float> &vertices, int depth) {
+struct Point {
+    float x, y;
+    Point(float x, float y) : x(x), y(y) {}
+};
+
+
+void generateSierpinski(std::vector<Point>& vertices, int depth, const Point& p1, const Point& p2, const Point& p3) {
     if (depth == 0) {
-        for (float vertex : vertices) {
-            sierpinskiVertices.push_back(vertex);
-        }
-    }
-    else {
-        std::vector<float> v1 = { (vertices[0] + vertices[3]) / 2, (vertices[1] + vertices[4]) / 2,};
-        std::vector<float> v2 = { (vertices[0] + vertices[6]) / 2, (vertices[1] + vertices[7]) / 2};
-        std::vector<float> v3 = { (vertices[3] + vertices[6]) / 2, (vertices[4] + vertices[7]) / 2};
+        vertices.push_back(p1);
+        vertices.push_back(p2);
+        vertices.push_back(p3);
+    } else {
+        // Calculate midpoints of the sides
+        Point mid1((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+        Point mid2((p2.x + p3.x) / 2, (p2.y + p3.y) / 2);
+        Point mid3((p3.x + p1.x) / 2, (p3.y + p1.y) / 2);
 
-        generateSierpinski(vertices, depth - 1);
-
-        // Create sub-triangles
-        std::vector<float> init_vec = { vertices[0], vertices[1], 0.0f, v1[0], v1[1], 0.0f, v2[0], v2[1], 0.0f };
-        generateSierpinski(init_vec, depth - 1);
-
-        std::vector<float> v4 = std::vector<float>{ v1[0], v1[1], 0.0f, vertices[3], vertices[4], 0.0f, v3[0], v3[1], 0.0f };
-        std::vector<float> v5 = std::vector<float>{ v2[0], v2[1], 0.0f, v3[0], v3[1], 0.0f, vertices[6], vertices[7], 0.0f };
-        generateSierpinski(v4, depth - 1);
-        generateSierpinski(v5, depth - 1);
+        // Recursively generate smaller triangles
+        generateSierpinski(vertices, depth - 1, p1, mid1, mid3);
+        generateSierpinski(vertices, depth - 1, mid1, p2, mid2);
+        generateSierpinski(vertices, depth - 1, mid3, mid2, p3);
     }
 }
+
 
 // Callback function for resizing the window
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -100,7 +103,6 @@ int main() {
         std::cerr << "Failed to initialize GLEW" << std::endl;
         return -1;
     }
-
     // Set viewport and callback for window resizing
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -122,44 +124,43 @@ int main() {
     glDeleteShader(fragmentShader);
 
     // Set up initial triangle
-    float initialTriangle[] = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f
-    };
+    std::vector<Point> initialTriangle;
+
 
     // Generate Sierpinski triangle vertices
-    std::vector<float> st_vert = std::vector<float>{ initialTriangle[0], initialTriangle[1], 0.0f, initialTriangle[3], initialTriangle[4], 0.0f, initialTriangle[6], initialTriangle[7], 0.0f };
-    generateSierpinski(st_vert, 7);
+    Point p1(-0.5f, -0.5f);
+    Point p2(0.5f, -0.5f);
+    Point p3(0.0f,0.5f);
+    generateSierpinski(initialTriangle, _DEPTH, p1, p2, p3);
+    float vertexArray[initialTriangle.size()*2];
+    for (int i = 0; i < initialTriangle.size()*2; i+=2) {
+        vertexArray[i] = initialTriangle[i/2].x;
+        vertexArray[i+1] = initialTriangle[i/2].y;
+    }
 
     // Set up Vertex Array Object (VAO) and Vertex Buffer Object (VBO)
+
     GLuint VAO, VBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
     glBindVertexArray(VAO);
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sierpinskiVertices.size() * sizeof(float), sierpinskiVertices.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBufferData(GL_ARRAY_BUFFER, initialTriangle.size() * sizeof(float) * 2, vertexArray, GL_DYNAMIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     glBindVertexArray(0);
 
     float oldTime = glfwGetTime();
 
+    int i = 1;
     while (!glfwWindowShouldClose(window)) {
         float time = glfwGetTime();
-        float frameTime = time - oldTime;
-
-        oldTime = time;
-
-        accumulator += frameTime;
-
-        while (accumulator >= fixedDeltaTime) {
-            accumulator -= fixedDeltaTime;
-        }
-
         processInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -168,24 +169,33 @@ int main() {
         glUseProgram(shaderProgram);
         int timeUniform = glGetUniformLocation(shaderProgram, "iTime");
         glUniform1f(timeUniform, time);
+
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, (3*i) * sizeof(float) * 2, vertexArray, GL_DYNAMIC_DRAW);
+        // Draw current triangle
+        glUseProgram(shaderProgram);
+        glUniform1f(timeUniform, time);
+
         glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, initialTriangle.size());
 
-        // Adjust line width based on sine function for a dynamic effect
-        //glLineWidth(5.0f * abs(sinf(time * 2)));
-
-        // Draw Sierpinski triangle
-        glDrawArrays(GL_LINES, 0, sierpinskiVertices.size() / 3);
+        if(i<initialTriangle.size()/3){
+            i++;
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+
     }
 
     // Clean up resources
-    glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteProgram(shaderProgram);
 
     // Terminate GLFW
     glfwTerminate();
+
     return 0;
 }
