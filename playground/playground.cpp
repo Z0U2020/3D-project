@@ -135,7 +135,8 @@ int main() {
     Point p2(0.5f, -0.5f);
     Point p3(0.0f, 0.5f);
     generateSierpinski(initialTriangle, _DEPTH, p1, p2, p3);
-    float vertexArray[initialTriangle.size() * 2];
+    static const int vertexArrSize = initialTriangle.size() * 2;
+    std::vector<float> vertexArray(vertexArrSize);
     for (int i = 0; i < initialTriangle.size() * 2; i += 2) {
         vertexArray[i] = initialTriangle[i / 2].x;
         vertexArray[i + 1] = initialTriangle[i / 2].y;
@@ -149,7 +150,7 @@ int main() {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, initialTriangle.size() * sizeof(float) * 2, vertexArray, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, initialTriangle.size() * sizeof(float) * 2, vertexArray.data(), GL_DYNAMIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -175,7 +176,7 @@ int main() {
 
         // Update vertex buffer data
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, (3 * i) * sizeof(float) * 2, vertexArray, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (3 * i) * sizeof(float) * 2, vertexArray.data(), GL_DYNAMIC_DRAW);
 
         // Draw current triangle
         glUseProgram(shaderProgram);

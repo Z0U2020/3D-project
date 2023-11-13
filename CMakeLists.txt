@@ -60,7 +60,6 @@ add_executable(playground
 	playground/SimpleVertexShader.vertexshader
 	common/shader.cpp
 	common/shader.hpp
-		external/glut-3.7/include/GL/glut.h
 )
 target_link_libraries(playground
 	${ALL_LIBS}
