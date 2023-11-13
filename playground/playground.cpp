@@ -1,14 +1,11 @@
 // Include necessary headers
-#define GLEW_STATIC
 #include "playground.h"
 #include <GL/glew.h>
 #include <glfw3.h>
 #include <iostream>
 #include <vector>
-#include "external/glut-3.7/include/GL/glut.h"
 
 // Set the depth level for the Sierpinski triangle
-const int _DEPTH = 8;
 
 // Vertex shader source code
 const char* vertexShaderSource = R"(
@@ -47,11 +44,6 @@ void main() {
 // Vector to store Sierpinski triangle vertices
 std::vector<float> sierpinskiVertices;
 
-// Define a structure for a 2D point
-struct Point {
-    float x, y;
-    Point(float x, float y) : x(x), y(y) {}
-};
 
 // Function to generate Sierpinski triangle
 void generateSierpinski(std::vector<Point>& vertices, int depth, const Point& p1, const Point& p2, const Point& p3) {
