@@ -41,9 +41,6 @@ void main() {
 }
 )";
 
-// Vector to store Sierpinski triangle vertices
-std::vector<float> sierpinskiVertices;
-
 
 // Function to generate Sierpinski triangle
 void generateSierpinski(std::vector<Point>& vertices, int depth, const Point& p1, const Point& p2, const Point& p3) {
@@ -78,11 +75,9 @@ void processInput(GLFWwindow* window) {
         glfwSetWindowShouldClose(window, true);
 }
 
-// Variables for fixed time step rendering
-float accumulator;
-const double fixedDeltaTime = 0.016;
 
 int main() {
+
     // Initialize GLFW
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -187,6 +182,8 @@ int main() {
 
         if (i < initialTriangle.size() / 3) {
             i++;
+        }else{
+            i=1;
         }
 
         glfwSwapBuffers(window);
