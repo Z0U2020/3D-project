@@ -1,19 +1,31 @@
-#ifndef PLAYGROUND_H
-#define PLAYGROUND_H
+#ifndef SIERPINSKI_TRIANGLE_H
+#define SIERPINSKI_TRIANGLE_H
 
-// Include GLEW
 #include <GL/glew.h>
+#include <glfw3.h>
+#include <iostream>
+#include <vector>
+#include "external/glut-3.7/include/GL/glut.h"
 
-//some global variables for handling the vertex buffer
-GLuint vertexbuffer;
-GLuint VertexArrayID;
-GLuint vertexbuffer_size;
+// Set the depth level for the Sierpinski triangle
+const int _DEPTH = 8;
 
-//program ID of the shaders, required for handling the shaders with OpenGL
-GLuint programID;
+// Structure for a 2D point
+struct Point {
+    float x, y;
+    Point(float x, float y) : x(x), y(y) {}
+};
 
+// Function to generate Sierpinski triangle
+void generateSierpinski(std::vector<Point>& vertices, int depth, const Point& p1, const Point& p2, const Point& p3);
 
-int main( void ); //<<< main function, called at startup
+// Callback function for resizing the window
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
+// Function to process input (e.g., closing the window)
+void processInput(GLFWwindow* window);
 
-#endif
+// Main rendering function
+void renderSierpinskiTriangle();
+
+#endif // SIERPINSKI_TRIANGLE_H
