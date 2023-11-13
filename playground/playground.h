@@ -5,7 +5,6 @@
 #include <glfw3.h>
 #include <iostream>
 #include <vector>
-#include "external/glut-3.7/include/GL/glut.h"
 
 // Set the depth level for the Sierpinski triangle
 const int _DEPTH = 8;
