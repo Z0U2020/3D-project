@@ -154,7 +154,6 @@ int main() {
 
     glBindVertexArray(0);
 
-    float oldTime = glfwGetTime();
 
     int i = 1;
     while (!glfwWindowShouldClose(window)) {
@@ -182,7 +181,8 @@ int main() {
 
         if (i < initialTriangle.size() / 3) {
             i++;
-        }else{
+        }
+        else{
             i=1;
         }
 
