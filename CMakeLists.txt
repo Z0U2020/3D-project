@@ -60,6 +60,12 @@ add_executable(playground
 	playground/SimpleVertexShader.vertexshader
 	common/shader.cpp
 	common/shader.hpp
+	playground/parse_stl.h
+	playground/parse_stl.cpp
+	playground/RenderingObject.cpp
+	playground/RenderingObject.h
+		common/texture.cpp
+		common/texture.hpp
 )
 target_link_libraries(playground
 	${ALL_LIBS}

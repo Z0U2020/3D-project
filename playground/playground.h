@@ -1,30 +1,47 @@
-#ifndef SIERPINSKI_TRIANGLE_H
-#define SIERPINSKI_TRIANGLE_H
+#ifndef PLAYGROUND_H
+#define PLAYGROUND_H
 
+// Include GLEW
 #include <GL/glew.h>
-#include <glfw3.h>
-#include <iostream>
+
+// Include GLM
+#include <glm/glm.hpp>
+
 #include <vector>
+#include "parse_stl.h"
 
-// Set the depth level for the Sierpinski triangle
-const int _DEPTH = 8;
+#include "RenderingObject.h"
 
-// Structure for a 2D point
-struct Point {
-    float x, y;
-    Point(float x, float y) : x(x), y(y) {}
-};
+//program ID of the shaders, required for handling the shaders with OpenGL
+GLuint programID;
 
-// Function to generate Sierpinski triangle
-void generateSierpinski(std::vector<Point>& vertices, int depth, const Point& p1, const Point& p2, const Point& p3);
+//global variables to handle the MVP matrix
+GLuint View_Matrix_ID;
+glm::mat4 V;
+GLuint Projection_Matrix_ID;
+glm::mat4 P;
+GLuint Model_Matrix_ID;
 
-// Callback function for resizing the window
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+RenderingObject ground;
+RenderingObject sphere1;
+RenderingObject sphere2;
 
-// Function to process input (e.g., closing the window)
-void processInput(GLFWwindow* window);
+float curr_x;
+float curr_y;
+float curr_angle;
 
-// Main rendering function
-void renderSierpinskiTriangle();
+float cam_z;
 
-#endif // SIERPINSKI_TRIANGLE_H
+
+int main( void ); //<<< main function, called at startup
+void updateAnimationLoop(); //<<< updates the animation loop
+bool initializeWindow(); //<<< initializes the window using GLFW and GLEW
+bool initializeMVPTransformation();
+bool initializeVertexbuffer(); //<<< initializes the vertex buffer array and binds it OpenGL
+bool cleanupVertexbuffer(); //<<< frees all recources from the vertex buffer
+bool closeWindow(); //<<< Closes the OpenGL window and terminates GLFW
+
+void updataMovingObjectTransformation();
+
+
+#endif
