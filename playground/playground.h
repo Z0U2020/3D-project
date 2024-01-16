@@ -6,6 +6,7 @@
 
 // Include GLM
 #include <glm/glm.hpp>
+#include "glm/gtc/matrix_transform.hpp"
 
 #include <vector>
 #include "parse_stl.h"
@@ -25,12 +26,20 @@ GLuint Model_Matrix_ID;
 RenderingObject ground;
 RenderingObject sphere1;
 RenderingObject sphere2;
+RenderingObject sphere3;
 
 float curr_x;
 float curr_y;
 float curr_angle;
 
 float cam_z;
+float sphere_x = 0.0f;
+float cam_y;
+float cam_angle;
+float rotate_angle;
+
+int numRings = 10;
+int numSegments = 10;
 
 
 int main( void ); //<<< main function, called at startup
@@ -41,7 +50,7 @@ bool initializeVertexbuffer(); //<<< initializes the vertex buffer array and bin
 bool cleanupVertexbuffer(); //<<< frees all recources from the vertex buffer
 bool closeWindow(); //<<< Closes the OpenGL window and terminates GLFW
 
-void updataMovingObjectTransformation();
+void updateMovingObjectTransformation();
 
 
 #endif

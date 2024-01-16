@@ -70,14 +70,17 @@ void updateAnimationLoop()
   // Use our shader
   glUseProgram(programID);
 
-  float scale = 0.5f;
-  if (glfwGetKey(window, GLFW_KEY_W)) curr_y+=scale;
-  else if (glfwGetKey(window, GLFW_KEY_S)) curr_y-=scale;
-  else if (glfwGetKey(window, GLFW_KEY_A)) curr_x-=scale;
-  else if (glfwGetKey(window, GLFW_KEY_D)) curr_x+=scale;
-  else if (glfwGetKey(window, GLFW_KEY_R)) curr_angle += 0.01;
-  else if (glfwGetKey(window, GLFW_KEY_O)) cam_z += scale;
-  else if (glfwGetKey(window, GLFW_KEY_L)) cam_z -= scale;
+
+  float scale = 1.0f;
+    if (glfwGetKey(window, GLFW_KEY_W)) curr_y+=0.1;
+    else if (glfwGetKey(window, GLFW_KEY_S)) curr_y-=0.1;
+    else if (glfwGetKey(window, GLFW_KEY_A)) curr_x-=0.1;
+    else if (glfwGetKey(window, GLFW_KEY_D)) curr_x+=0.1;
+    else if (glfwGetKey(window, GLFW_KEY_O)) cam_z += 1.5;
+    else if (glfwGetKey(window, GLFW_KEY_L)) cam_z -= 1.5;
+    else if (glfwGetKey(window, GLFW_KEY_R)) curr_x = 0,curr_y = 0,cam_z = 300;
+  sphere1.M = glm::rotate(glm::mat4(1.0f), cam_angle, { 0.0f, 1.0f, 0.0f });
+
   initializeMVPTransformation();
 
   // Send our transformation to the currently bound shader, 
@@ -87,21 +90,38 @@ void updateAnimationLoop()
   glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &ground.M[0][0]);
   ground.DrawObject();
 
-  sphere2.DrawObject();
-
-  updataMovingObjectTransformation();
+    updateMovingObjectTransformation();
   glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere1.M[0][0]);
   sphere1.DrawObject();
+
+    updateMovingObjectTransformation();
+  glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere2.M[0][0]);
+  sphere2.DrawObject();
+    rotate_angle += 1.0f;
+    sphere_x += 1.0f;
 
   // Swap buffers
   glfwSwapBuffers(window);
   glfwPollEvents();
 }
 
-void updataMovingObjectTransformation()
+void updateMovingObjectTransformation()
 {
-    sphere1.M = glm::rotate(glm::mat4(1.0f), curr_angle, {1.0f, 0.0f, 0.0f });
-    sphere1.M = glm::translate(sphere1.M, {curr_x, curr_y, 0.0f });
+    // Reset the model matrices to the identity matrix
+    sphere1.M = glm::mat4(1.0f);
+    sphere2.M = glm::mat4(1.0f);
+
+    // Apply translation to sphere1 along the x-axis
+    glm::mat4 translate1 = glm::translate(glm::mat4(1.0f), { sphere_x, 0.0f, 0.0f });
+    sphere1.M = translate1 * sphere1.M;
+
+    // Apply translation to sphere2 along the x-axis (offset vertically from sphere1)
+    glm::mat4 translate2 = glm::translate(glm::mat4(1.0f), { sphere_x, 150.0f, 0.0f });
+    sphere2.M = translate2 * sphere2.M;
+
+    // Apply rotation to sphere2 around the x-axis relative to sphere1
+    glm::mat4 rotate2 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 0.0f, 1.0f});
+    sphere2.M = rotate2 * sphere2.M;
 }
 
 bool initializeWindow()
@@ -143,37 +163,49 @@ bool initializeWindow()
   glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
   // Dark blue background
-  glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   return true;
 }
 
 bool initializeMVPTransformation()
 {
-  // Get a handle for our "MVP" uniform
-  Model_Matrix_ID = glGetUniformLocation(programID, "M");
-  Projection_Matrix_ID = glGetUniformLocation(programID, "P");
-  View_Matrix_ID = glGetUniformLocation(programID, "V");
-    
-  // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-  P = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 10000.0f);
-   
-  // Camera matrix
-  V = glm::lookAt(
-    glm::vec3(0, 0, cam_z), // Camera is at (4,3,-3), in World Space
-    glm::vec3(0, 0, 0), // and looks at the origin
-    glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
-  );
-  
-  return true;
-  
+    // Get a handle for our "MVP" uniform
+    Model_Matrix_ID = glGetUniformLocation(programID, "M");
+    Projection_Matrix_ID = glGetUniformLocation(programID, "P");
+    View_Matrix_ID = glGetUniformLocation(programID, "V");
+
+    // Projection matrix : 45? Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+    P = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 10000.0f);
+
+    // Update the camera translation based on user input (curr_x, curr_y)
+    // Orbit around the cube position (make the cube the center of rotation)
+    float radius = cam_z; // Set a radius for the orbit
+    float cameraX = radius * sin(curr_x);
+    float cameraY = radius * sin(curr_y);
+    float cameraZ = radius * cos(curr_x);
+
+    glm::vec3 cameraPosition = glm::vec3(cameraX, cameraY, cameraZ);
+
+    // Apply continuous rotation to the camera around the cube
+    glm::vec3 upVector(0, 1, 0); // Up direction remains constant
+
+    V = glm::lookAt(
+            cameraPosition, // Camera position orbiting around the cube
+            glm::vec3{0.0f, 0.0f, 0.0f},   // Camera looks at the cube
+            upVector        // Up direction remains constant
+    );
+
+    return true;
+
 }
+
 
 bool initializeVertexbuffer()
 {
   //####################### FIRST OBJECT: GROUND ###################
   ground = RenderingObject();
   ground.InitializeVAO();
-  
+
   //create vertex data
   std::vector< glm::vec3 > vertices = std::vector< glm::vec3 >();
   vertices.push_back({-120,-50,-120});
@@ -183,7 +215,7 @@ bool initializeVertexbuffer()
   vertices.push_back({ 120,-50,120 });
   vertices.push_back({ 120,-50,-120 });
   ground.SetVertices(vertices);
-  
+
   //create normal data
   std::vector< glm::vec3 > normals = std::vector< glm::vec3 >();
   ground.computeVertexNormalsOfTriangles(vertices, normals);
@@ -191,6 +223,7 @@ bool initializeVertexbuffer()
 
   //create texture data
   ground.textureSamplerID = glGetUniformLocation(programID, "myTextureSampler");
+
   float scaling = 5.0f;
   std::vector< glm::vec2 > uvbufferdata;
   uvbufferdata.push_back({ 0.0f, 0.0f });
@@ -201,15 +234,32 @@ bool initializeVertexbuffer()
   uvbufferdata.push_back({ scaling,0.0f });
   ground.SetTexture(uvbufferdata, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\brick_2.bmp)");
 
-  //####################### SECOND OBJECT: BUNNY ###################
+  //####################### SECOND OBJECT: SPHERE ###################
   sphere1 = RenderingObject();
   sphere1.InitializeVAO();
-  sphere1.LoadSTL(R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\Sphere.stl)");
+  sphere1.LoadSTLSphere(R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\Sphere.stl)");
+
+    std::vector< glm::vec3 > normalsSphere = std::vector< glm::vec3 >();
+    sphere1.computeVertexNormalsOfTriangles(sphere1.vertices, normalsSphere);
+    sphere1.SetNormals(normalsSphere);
+
+    sphere1.textureSamplerID = glGetUniformLocation(programID, "myTextureSampler");
+
+  std::vector<glm::vec2> sphere1UVBuffer;  // Adjust this based on your UV coordinates for the sphere
+    for (int i = 0; i <= numRings; ++i) {
+        for (int j = 0; j <= numSegments; ++j) {
+            float u = static_cast<float>(j) / static_cast<float>(numSegments);
+            float v = static_cast<float>(i) / static_cast<float>(numRings);
+            sphere1UVBuffer.emplace_back(u, v);
+        }
+    }
+  sphere1.SetTexture(sphere1UVBuffer, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\ball-texture.bmp)");
 
 
   sphere2 = RenderingObject();
   sphere2.InitializeVAO();
-  sphere2.LoadSTL(R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\Sphere.stl)");
+  sphere2.LoadSTLSphere(R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\Sphere.stl)");
+
 
   return true;
 }

@@ -5,12 +5,14 @@
 #include <vector>
 #include <string>
 #include "parse_stl.h"
+#include "glm/gtc/matrix_transform.hpp"
 
 
 class RenderingObject
 {
 public:
-	RenderingObject();
+    RenderingObject();
+    RenderingObject(const glm::vec3& position);
 	virtual ~RenderingObject();
 
   void InitializeVAO();
@@ -37,6 +39,7 @@ public:
   GLuint textureSamplerID;
   bool texture_present;
 
+  std::vector< glm::vec3 > vertices;
   //Model matrix: moves object from model to world space
   glm::mat4 M;
 
@@ -47,11 +50,13 @@ public:
   */
   void computeVertexNormalsOfTriangles(std::vector< glm::vec3 >& vertices, std::vector< glm::vec3 >& normals);
 
+    void LoadSTLSphere(std::string stl_file_name);
+
 protected:
 
   std::vector<glm::vec3> getAllTriangleNormalsForVertex(stl::point vertex, std::vector<stl::triangle> triangles);
   glm::vec3 computeMeanVector(std::vector<glm::vec3>);
-  
+
 
 };
 
