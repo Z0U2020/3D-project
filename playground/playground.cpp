@@ -89,7 +89,7 @@ void updateAnimationLoop()
   glUniformMatrix4fv(Projection_Matrix_ID, 1, GL_FALSE, &P[0][0]);
 /*  glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &ground.M[0][0]);
   ground.DrawObject();*/
-
+//####################### FIRST BUNDLE ###################
     updateMovingObjectTransformation();
   glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere1.M[0][0]);
   sphere1.DrawObject();
@@ -105,9 +105,50 @@ void updateAnimationLoop()
   updateMovingObjectTransformation();
   glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere4.M[0][0]);
   sphere4.DrawObject();
-    rotate_angle += 1.0f;
-    sphere_x += 1.0f;
+    //bundle1_x += 1.0f;
 
+//####################### SECOND BUNDLE ###################
+    updateMovingObjectTransformation();
+    glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere5.M[0][0]);
+    sphere1.DrawObject();
+
+    updateMovingObjectTransformation();
+    glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere6.M[0][0]);
+    sphere2.DrawObject();
+
+    updateMovingObjectTransformation();
+    glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere7.M[0][0]);
+    sphere3.DrawObject();
+
+    updateMovingObjectTransformation();
+    glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere8.M[0][0]);
+    sphere4.DrawObject();
+    //bundle2_x += 1.0f;
+
+    //####################### SECOND BUNDLE ###################
+    updateMovingObjectTransformation();
+    glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere9.M[0][0]);
+    sphere1.DrawObject();
+
+    updateMovingObjectTransformation();
+    glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere10.M[0][0]);
+    sphere2.DrawObject();
+
+    updateMovingObjectTransformation();
+    glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere11.M[0][0]);
+    sphere3.DrawObject();
+
+    updateMovingObjectTransformation();
+    glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere12.M[0][0]);
+    sphere4.DrawObject();
+    //bundle3_x += 1.0f;
+
+    //####################### REAL EARTH ###################
+    updateMovingObjectTransformation();
+    glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &realEarth.M[0][0]);
+    realEarth.DrawObject();
+
+    rotate_angle += 1.0f;
   // Swap buffers
   glfwSwapBuffers(window);
   glfwPollEvents();
@@ -115,25 +156,82 @@ void updateAnimationLoop()
 
 void updateMovingObjectTransformation()
 {
+
+    //####################### FIRST BUNDLE ###################
     // Reset the model matrices to the identity matrix
-    glm::mat4 translate1 = glm::translate(glm::mat4(1.0f), { sphere_x, 0.0f, 0.0f });
-    sphere1.M = translate1;
+    glm::mat4 rotationCenterY = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 1.0f, 0.0f});
+
+    glm::mat4 translate1 = glm::translate(glm::mat4(1.0f), bundle1_pos);
+    sphere1.M = rotationCenterY * translate1;
 
     // Apply rotation to sphere2 around the x-axis relative to sphere1
     glm::mat4 rotate2 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 0.0f, 1.0f});
-    glm::mat4 translate2 = glm::translate(glm::mat4(1.0f), { 150.0f, 0.0f, 0.0f }); // Offset from sphere1
-    sphere2.M = translate1 * rotate2 * translate2;
+    glm::mat4 translate2 = glm::translate(glm::mat4(1.0f), {  150.0f, 0.0f, 0.0f }); // Offset from sphere1
+    sphere2.M = rotationCenterY * translate1 * rotate2 * translate2;
 
     // Apply rotation to sphere3 around the x-axis relative to sphere1
     glm::mat4 rotate3 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {1.0f, 0.0f, 0.0f});
-    glm::mat4 translate3 = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 150.0f }); // Offset from sphere1
-    sphere3.M = translate1 * rotate3 * translate3;
+    glm::mat4 translate3 = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f,  150.0f }); // Offset from sphere1
+    sphere3.M = rotationCenterY * translate1 * rotate3 * translate3;
 
     // Apply rotation to sphere4 around the x-axis relative to sphere1
     glm::mat4 rotate4 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 1.0f, 0.0f});
-    glm::mat4 translate4 = glm::translate(glm::mat4(1.0f), { -150.0f, 0.0f, 0.0f }); // Offset from sphere1
-    sphere4.M = translate1 * rotate4 * translate4;
+    glm::mat4 translate4 = glm::translate(glm::mat4(1.0f), { - 150.0f, 0.0f, 0.0f }); // Offset from sphere1
+    sphere4.M = rotationCenterY * translate1 * rotate4 * translate4;
 
+
+    //####################### SECOND BUNDLE ###################
+    // Reset the model matrices to the identity matrix
+
+    glm::mat4 rotationCenterX = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 0.0f, 1.0f});
+
+    glm::mat4 translate5 = glm::translate(glm::mat4(1.0f), bundle2_pos);
+    sphere5.M = rotationCenterX * translate5;
+
+    // Apply rotation to sphere2 around the x-axis relative to sphere1
+    glm::mat4 rotate6 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 0.0f, 1.0f});
+    glm::mat4 translate6 = glm::translate(glm::mat4(1.0f), { 150.0f, 0.0f, 0.0f }); // Offset from sphere1
+    sphere6.M = rotationCenterX * translate5 * rotate6 * translate6;
+
+    // Apply rotation to sphere3 around the x-axis relative to sphere1
+    glm::mat4 rotate7 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {1.0f, 0.0f, 0.0f});
+    glm::mat4 translate7 = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f,  150.0f }); // Offset from sphere1
+    sphere7.M = rotationCenterX * translate5 * rotate7 * translate7;
+
+    // Apply rotation to sphere4 around the x-axis relative to sphere1
+    glm::mat4 rotate8 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 1.0f, 0.0f});
+    glm::mat4 translate8 = glm::translate(glm::mat4(1.0f), {-150.0f, 0.0f, 0.0f }); // Offset from sphere1
+    sphere8.M = rotationCenterX * translate5 * rotate8 * translate8;
+
+
+    //####################### THIRD BUNDLE ###################
+    // Reset the model matrices to the identity matrix
+
+    glm::mat4 rotationCenterZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {1.0f, 0.0f, 0.0f});
+    glm::mat4 translate9 = glm::translate(glm::mat4(1.0f), bundle3_pos);
+    sphere9.M = rotationCenterZ * translate9;
+
+    // Apply rotation to sphere2 around the x-axis relative to sphere1
+    glm::mat4 rotate10 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 0.0f, 1.0f});
+    glm::mat4 translate10 = glm::translate(glm::mat4(1.0f), {150.0f, 0.0f, 0.0f }); // Offset from sphere1
+    sphere10.M = rotationCenterZ * translate9 * rotate10 * translate10;
+
+    // Apply rotation to sphere3 around the x-axis relative to sphere1
+    glm::mat4 rotate11 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {1.0f, 0.0f, 0.0f});
+    glm::mat4 translate11 = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f,150.0f }); // Offset from sphere1
+    sphere11.M = rotationCenterZ * translate9 * rotate11 * translate11;
+
+    // Apply rotation to sphere4 around the x-axis relative to sphere1
+    glm::mat4 rotate12 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 1.0f, 0.0f});
+    glm::mat4 translate12 = glm::translate(glm::mat4(1.0f), {-150.0f, 0.0f, 0.0f }); // Offset from sphere1
+    sphere12.M = rotationCenterZ * translate9 * rotate12 * translate12;
+
+    //####################### REAL EARTH ###################
+
+    glm::mat4 translate13 = glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f});
+    glm::mat4 scale13 = glm::scale(glm::mat4(1.0f), { 0.5f, 0.5f, 0.5f });
+    glm::mat4 rotate13 = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), {0.0f, 0.0f, 1.0f});
+    realEarth.M = rotate12 * translate13 * scale13;
 }
 
 bool initializeWindow()
@@ -246,35 +344,14 @@ bool initializeVertexbuffer()
   uvbufferdata.push_back({ scaling,0.0f });*/
   ground.SetTexture(uvbufferdata, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\brick_2.bmp)");
 
-  //####################### SECOND OBJECT: SPHERE ###################
+  //####################### SECOND OBJECT: first bundle ###################
   sphere1 = RenderingObject();
   sphere1.InitializeVAO();
-  sphere1.LoadSTLSphere(R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\Sphere.stl)");
-
-  //sphere1.SetTexture(uvbufferdata, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\brick_2.bmp)");
-
-
-  //trying to get the texture to work
- /*   std::vector< glm::vec3 > normalsSphere = std::vector< glm::vec3 >();
-    sphere1.computeVertexNormalsOfTriangles(sphere1.vertices, normalsSphere);
-    sphere1.SetNormals(normalsSphere);
-
-    sphere1.textureSamplerID = glGetUniformLocation(programID, "myTextureSampler");
-
-  std::vector<glm::vec2> sphere1UVBuffer;  // Adjust this based on your UV coordinates for the sphere
-    for (int i = 0; i <= numRings; ++i) {
-        for (int j = 0; j <= numSegments; ++j) {
-            float u = static_cast<float>(j) / static_cast<float>(numSegments);
-            float v = static_cast<float>(i) / static_cast<float>(numRings);
-            sphere1UVBuffer.emplace_back(u, v);
-        }
-    }
-  sphere1.SetTexture(sphere1UVBuffer, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\ball-texture.bmp)");*/
-
+  sphere1.LoadSTLSphere("Sphere.stl");
 
   sphere2 = RenderingObject();
   sphere2.InitializeVAO();
-  sphere2.LoadSTLSphere(R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\Sphere.stl)");
+  sphere2.LoadSTLSphere("Sphere.stl");
 
   sphere3 = RenderingObject();
   sphere3.InitializeVAO();
@@ -284,6 +361,45 @@ bool initializeVertexbuffer()
   sphere4.InitializeVAO();
   sphere4.LoadSTLSphere("Sphere.stl");
 
+    //####################### SECOND OBJECT: second bundle ###################
+
+    sphere5 = RenderingObject();
+    sphere5.InitializeVAO();
+    sphere5.LoadSTLSphere("Sphere.stl");
+
+    sphere6 = RenderingObject();
+    sphere6.InitializeVAO();
+    sphere6.LoadSTLSphere("Sphere.stl");
+
+    sphere7 = RenderingObject();
+    sphere7.InitializeVAO();
+    sphere7.LoadSTLSphere("Sphere.stl");
+
+    sphere8 = RenderingObject();
+    sphere8.InitializeVAO();
+    sphere8.LoadSTLSphere("Sphere.stl");
+
+    //####################### SECOND OBJECT: third bundle ###################
+
+    sphere9 = RenderingObject();
+    sphere9.InitializeVAO();
+    sphere9.LoadSTLSphere("Sphere.stl");
+
+    sphere10 = RenderingObject();
+    sphere10.InitializeVAO();
+    sphere10.LoadSTLSphere("Sphere.stl");
+
+    sphere11 = RenderingObject();
+    sphere11.InitializeVAO();
+    sphere11.LoadSTLSphere("Sphere.stl");
+
+    sphere12 = RenderingObject();
+    sphere12.InitializeVAO();
+    sphere12.LoadSTLSphere("Sphere.stl");
+
+    realEarth = RenderingObject();
+    realEarth.InitializeVAO();
+    realEarth.LoadSTLSphere("flatearth-binary.stl");
 
   return true;
 }

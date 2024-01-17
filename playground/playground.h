@@ -28,13 +28,28 @@ RenderingObject sphere1;
 RenderingObject sphere2;
 RenderingObject sphere3;
 RenderingObject sphere4;
+RenderingObject sphere5;
+RenderingObject sphere6;
+RenderingObject sphere7;
+RenderingObject sphere8;
+RenderingObject sphere9;
+RenderingObject sphere10;
+RenderingObject sphere11;
+RenderingObject sphere12;
+
+RenderingObject realEarth;
+
 
 float curr_x;
 float curr_y;
 float curr_angle;
 
+
+
 float cam_z;
-float sphere_x = 0.0f;
+glm::vec3 bundle1_pos = {400.0f, 0.0f, 0.0f};
+glm::vec3 bundle2_pos = {0.0f, 400.0f, 0.0f};
+glm::vec3 bundle3_pos = {0.0f, 0.0f, 400.0f};
 float cam_y;
 float cam_angle;
 float rotate_angle;
