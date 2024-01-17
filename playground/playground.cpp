@@ -18,6 +18,21 @@ using namespace glm;
 
 int main( void )
 {
+    // Red
+    glm::vec3 redColor = glm::vec3(1.0f, 0.0f, 0.0f);
+
+    // Blue
+    glm::vec3 blueColor = glm::vec3(0.0f, 0.0f, 1.0f);
+
+    // Green
+    glm::vec3 greenColor = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    // White
+    glm::vec3 whiteColor = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    // Orange
+    glm::vec3 orangeColor = glm::vec3(1.0f, 0.5f, 0.0f);
+
   //Initialize window
   bool windowInitialized = initializeWindow();
   if (!windowInitialized) return -1;
@@ -78,7 +93,14 @@ void updateAnimationLoop()
     else if (glfwGetKey(window, GLFW_KEY_D)) curr_x+=0.1;
     else if (glfwGetKey(window, GLFW_KEY_O)) cam_z += 1.5;
     else if (glfwGetKey(window, GLFW_KEY_L)) cam_z -= 1.5;
-    else if (glfwGetKey(window, GLFW_KEY_R)) curr_x = 0,curr_y = 0,cam_z = 300;
+    else if (glfwGetKey(window, GLFW_KEY_RIGHT)) cam_lookAt_x += 1.0;
+    else if (glfwGetKey(window, GLFW_KEY_LEFT)) cam_lookAt_x -= 1.0;
+    else if (glfwGetKey(window, GLFW_KEY_UP)) cam_z += 0.1;
+    else if (glfwGetKey(window, GLFW_KEY_DOWN)) cam_z -= 0.1;
+    else if (glfwGetKey(window, GLFW_KEY_Q)) cam_angle += 0.1;
+    else if (glfwGetKey(window, GLFW_KEY_E)) cam_angle -= 0.1;
+
+    else if (glfwGetKey(window, GLFW_KEY_R)) curr_x = 0,curr_y = 0,cam_z = 300, cam_lookAt_x = 0, cam_angle = 0, rotate_angle = 0;
   sphere1.M = glm::rotate(glm::mat4(1.0f), cam_angle, { 0.0f, 1.0f, 0.0f });
 
   initializeMVPTransformation();
@@ -91,6 +113,8 @@ void updateAnimationLoop()
   ground.DrawObject();*/
 //####################### FIRST BUNDLE ###################
     updateMovingObjectTransformation();
+    sphere1.color = greenColor;
+    glUniform3fv(Color_Matrix_ID, 1, &sphere1.color[0]);
   glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere1.M[0][0]);
   sphere1.DrawObject();
 
@@ -108,6 +132,8 @@ void updateAnimationLoop()
     //bundle1_x += 1.0f;
 
 //####################### SECOND BUNDLE ###################
+    sphere5.color = blueColor;
+    glUniform3fv(Color_Matrix_ID, 1, &sphere5.color[0]);
     updateMovingObjectTransformation();
     glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere5.M[0][0]);
     sphere1.DrawObject();
@@ -125,8 +151,11 @@ void updateAnimationLoop()
     sphere4.DrawObject();
     //bundle2_x += 1.0f;
 
-    //####################### SECOND BUNDLE ###################
+    //####################### THIRD BUNDLE ###################
+    sphere9.color = redColor;
+    glUniform3fv(Color_Matrix_ID, 1, &sphere9.color[0]);
     updateMovingObjectTransformation();
+
     glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere9.M[0][0]);
     sphere1.DrawObject();
 
@@ -229,9 +258,9 @@ void updateMovingObjectTransformation()
     //####################### REAL EARTH ###################
 
     glm::mat4 translate13 = glm::translate(glm::mat4(1.0f), {0.0f, 0.0f, 0.0f});
-    glm::mat4 scale13 = glm::scale(glm::mat4(1.0f), { 0.5f, 0.5f, 0.5f });
+    //glm::mat4 scale13 = glm::scale(glm::mat4(1.0f), { 0.5f, 0.5f, 0.5f });
     glm::mat4 rotate13 = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), {0.0f, 0.0f, 1.0f});
-    realEarth.M = rotate12 * translate13 * scale13;
+    realEarth.M = rotate12 * translate13;
 }
 
 bool initializeWindow()
@@ -283,6 +312,7 @@ bool initializeMVPTransformation()
     Model_Matrix_ID = glGetUniformLocation(programID, "M");
     Projection_Matrix_ID = glGetUniformLocation(programID, "P");
     View_Matrix_ID = glGetUniformLocation(programID, "V");
+    Color_Matrix_ID = glGetUniformLocation(programID, "inColor");
 
     // Projection matrix : 45? Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
     P = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 10000.0f);
@@ -294,14 +324,14 @@ bool initializeMVPTransformation()
     float cameraY = radius * sin(curr_y);
     float cameraZ = radius * cos(curr_x);
 
-    glm::vec3 cameraPosition = glm::vec3(cameraX, cameraY, cameraZ);
+    glm::vec3 cameraPosition = glm::vec3(cameraX+cam_lookAt_x, cameraY, cameraZ+800);
 
     // Apply continuous rotation to the camera around the cube
     glm::vec3 upVector(0, 1, 0); // Up direction remains constant
 
     V = glm::lookAt(
             cameraPosition, // Camera position orbiting around the cube
-            glm::vec3{0.0f, 0.0f, 0.0f},   // Camera looks at the cube
+            glm::vec3{cam_lookAt_x, 0.0f, 0.0f},   // Camera looks at the cube
             upVector        // Up direction remains constant
     );
 

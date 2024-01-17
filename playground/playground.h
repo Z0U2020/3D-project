@@ -22,6 +22,7 @@ glm::mat4 V;
 GLuint Projection_Matrix_ID;
 glm::mat4 P;
 GLuint Model_Matrix_ID;
+GLuint Color_Matrix_ID;
 
 RenderingObject ground;
 RenderingObject sphere1;
@@ -39,12 +40,15 @@ RenderingObject sphere12;
 
 RenderingObject realEarth;
 
+glm::vec3 redColor, greenColor, blueColor, yellowColor, orangeColor, purpleColor, cyanColor, magentaColor, brownColor, pinkColor, grayColor, lightGrayColor;
+
 
 float curr_x;
 float curr_y;
 float curr_angle;
 
 
+float cam_lookAt_x;
 
 float cam_z;
 glm::vec3 bundle1_pos = {400.0f, 0.0f, 0.0f};

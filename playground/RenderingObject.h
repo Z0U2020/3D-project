@@ -40,6 +40,7 @@ public:
 
   //Model matrix: moves object from model to world space
   glm::mat4 M;
+  glm::vec3 color;
 
   /**
   * Computes the normals of triangles by computing the cross product.
