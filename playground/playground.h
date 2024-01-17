@@ -27,6 +27,7 @@ RenderingObject ground;
 RenderingObject sphere1;
 RenderingObject sphere2;
 RenderingObject sphere3;
+RenderingObject sphere4;
 
 float curr_x;
 float curr_y;

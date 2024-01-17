@@ -101,8 +101,12 @@ void updateAnimationLoop()
   updateMovingObjectTransformation();
   glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere3.M[0][0]);
   sphere3.DrawObject();
+
+  updateMovingObjectTransformation();
+  glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere4.M[0][0]);
+  sphere4.DrawObject();
     rotate_angle += 1.0f;
-    //sphere_x += 1.0f;
+    sphere_x += 1.0f;
 
   // Swap buffers
   glfwSwapBuffers(window);
@@ -112,27 +116,24 @@ void updateAnimationLoop()
 void updateMovingObjectTransformation()
 {
     // Reset the model matrices to the identity matrix
-    sphere1.M = glm::mat4(1.0f);
-    sphere2.M = glm::mat4(1.0f);
-    sphere3.M = glm::mat4(1.0f);
-
-    // Apply translation to sphere1 along the x-axis
     glm::mat4 translate1 = glm::translate(glm::mat4(1.0f), { sphere_x, 0.0f, 0.0f });
-    sphere1.M = translate1 * sphere1.M;
-
-    // Apply translation to sphere2 along the x-axis (offset vertically from sphere1)
-    glm::mat4 translate2 = glm::translate(glm::mat4(1.0f), { sphere_x, 150.0f, 0.0f });
-    sphere2.M = translate2 * sphere2.M;
-
-    glm::mat4 translate3 = glm::translate(glm::mat4(1.0f), { sphere_x, 0.0f, 150.0f});
-    sphere3.M = translate3 * sphere3.M;
+    sphere1.M = translate1;
 
     // Apply rotation to sphere2 around the x-axis relative to sphere1
     glm::mat4 rotate2 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 0.0f, 1.0f});
-    sphere2.M = rotate2 * sphere2.M;
+    glm::mat4 translate2 = glm::translate(glm::mat4(1.0f), { 150.0f, 0.0f, 0.0f }); // Offset from sphere1
+    sphere2.M = translate1 * rotate2 * translate2;
 
+    // Apply rotation to sphere3 around the x-axis relative to sphere1
     glm::mat4 rotate3 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {1.0f, 0.0f, 0.0f});
-    sphere3.M = rotate3 * sphere3.M;
+    glm::mat4 translate3 = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 150.0f }); // Offset from sphere1
+    sphere3.M = translate1 * rotate3 * translate3;
+
+    // Apply rotation to sphere4 around the x-axis relative to sphere1
+    glm::mat4 rotate4 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 1.0f, 0.0f});
+    glm::mat4 translate4 = glm::translate(glm::mat4(1.0f), { -150.0f, 0.0f, 0.0f }); // Offset from sphere1
+    sphere4.M = translate1 * rotate4 * translate4;
+
 }
 
 bool initializeWindow()
@@ -213,7 +214,7 @@ bool initializeMVPTransformation()
 
 bool initializeVertexbuffer()
 {
-  /*//####################### FIRST OBJECT: GROUND ###################
+  //####################### FIRST OBJECT: GROUND ###################
   ground = RenderingObject();
   ground.InitializeVAO();
 
@@ -237,18 +238,20 @@ bool initializeVertexbuffer()
 
   float scaling = 5.0f;
   std::vector< glm::vec2 > uvbufferdata;
-  uvbufferdata.push_back({ 0.0f, 0.0f });
+  /*uvbufferdata.push_back({ 0.0f, 0.0f });
   uvbufferdata.push_back({ 0.0f, scaling });
   uvbufferdata.push_back({ scaling, scaling });
   uvbufferdata.push_back({ 0.0f,0.0f });
   uvbufferdata.push_back({ scaling,scaling });
-  uvbufferdata.push_back({ scaling,0.0f });
-  ground.SetTexture(uvbufferdata, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\brick_2.bmp)");*/
+  uvbufferdata.push_back({ scaling,0.0f });*/
+  ground.SetTexture(uvbufferdata, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\brick_2.bmp)");
 
   //####################### SECOND OBJECT: SPHERE ###################
   sphere1 = RenderingObject();
   sphere1.InitializeVAO();
   sphere1.LoadSTLSphere(R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\Sphere.stl)");
+
+  //sphere1.SetTexture(uvbufferdata, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\brick_2.bmp)");
 
 
   //trying to get the texture to work
@@ -276,6 +279,10 @@ bool initializeVertexbuffer()
   sphere3 = RenderingObject();
   sphere3.InitializeVAO();
   sphere3.LoadSTLSphere("Sphere.stl");
+
+  sphere4 = RenderingObject();
+  sphere4.InitializeVAO();
+  sphere4.LoadSTLSphere("Sphere.stl");
 
 
   return true;
