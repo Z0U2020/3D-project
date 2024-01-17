@@ -12,7 +12,6 @@ class RenderingObject
 {
 public:
     RenderingObject();
-    RenderingObject(const glm::vec3& position);
 	virtual ~RenderingObject();
 
   void InitializeVAO();
@@ -39,7 +38,6 @@ public:
   GLuint textureSamplerID;
   bool texture_present;
 
-  std::vector< glm::vec3 > vertices;
   //Model matrix: moves object from model to world space
   glm::mat4 M;
 

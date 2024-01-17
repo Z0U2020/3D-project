@@ -87,8 +87,8 @@ void updateAnimationLoop()
   // in the "MVP" uniform
   glUniformMatrix4fv(View_Matrix_ID, 1, GL_FALSE, &V[0][0]);
   glUniformMatrix4fv(Projection_Matrix_ID, 1, GL_FALSE, &P[0][0]);
-  glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &ground.M[0][0]);
-  ground.DrawObject();
+/*  glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &ground.M[0][0]);
+  ground.DrawObject();*/
 
     updateMovingObjectTransformation();
   glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere1.M[0][0]);
@@ -97,8 +97,12 @@ void updateAnimationLoop()
     updateMovingObjectTransformation();
   glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere2.M[0][0]);
   sphere2.DrawObject();
+
+  updateMovingObjectTransformation();
+  glUniformMatrix4fv(Model_Matrix_ID, 1, GL_FALSE, &sphere3.M[0][0]);
+  sphere3.DrawObject();
     rotate_angle += 1.0f;
-    sphere_x += 1.0f;
+    //sphere_x += 1.0f;
 
   // Swap buffers
   glfwSwapBuffers(window);
@@ -110,6 +114,7 @@ void updateMovingObjectTransformation()
     // Reset the model matrices to the identity matrix
     sphere1.M = glm::mat4(1.0f);
     sphere2.M = glm::mat4(1.0f);
+    sphere3.M = glm::mat4(1.0f);
 
     // Apply translation to sphere1 along the x-axis
     glm::mat4 translate1 = glm::translate(glm::mat4(1.0f), { sphere_x, 0.0f, 0.0f });
@@ -119,9 +124,15 @@ void updateMovingObjectTransformation()
     glm::mat4 translate2 = glm::translate(glm::mat4(1.0f), { sphere_x, 150.0f, 0.0f });
     sphere2.M = translate2 * sphere2.M;
 
+    glm::mat4 translate3 = glm::translate(glm::mat4(1.0f), { sphere_x, 0.0f, 150.0f});
+    sphere3.M = translate3 * sphere3.M;
+
     // Apply rotation to sphere2 around the x-axis relative to sphere1
     glm::mat4 rotate2 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {0.0f, 0.0f, 1.0f});
     sphere2.M = rotate2 * sphere2.M;
+
+    glm::mat4 rotate3 = glm::rotate(glm::mat4(1.0f), glm::radians(rotate_angle), {1.0f, 0.0f, 0.0f});
+    sphere3.M = rotate3 * sphere3.M;
 }
 
 bool initializeWindow()
@@ -163,7 +174,7 @@ bool initializeWindow()
   glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
   // Dark blue background
-  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
   return true;
 }
 
@@ -202,7 +213,7 @@ bool initializeMVPTransformation()
 
 bool initializeVertexbuffer()
 {
-  //####################### FIRST OBJECT: GROUND ###################
+  /*//####################### FIRST OBJECT: GROUND ###################
   ground = RenderingObject();
   ground.InitializeVAO();
 
@@ -232,14 +243,16 @@ bool initializeVertexbuffer()
   uvbufferdata.push_back({ 0.0f,0.0f });
   uvbufferdata.push_back({ scaling,scaling });
   uvbufferdata.push_back({ scaling,0.0f });
-  ground.SetTexture(uvbufferdata, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\brick_2.bmp)");
+  ground.SetTexture(uvbufferdata, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\brick_2.bmp)");*/
 
   //####################### SECOND OBJECT: SPHERE ###################
   sphere1 = RenderingObject();
   sphere1.InitializeVAO();
   sphere1.LoadSTLSphere(R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\Sphere.stl)");
 
-    std::vector< glm::vec3 > normalsSphere = std::vector< glm::vec3 >();
+
+  //trying to get the texture to work
+ /*   std::vector< glm::vec3 > normalsSphere = std::vector< glm::vec3 >();
     sphere1.computeVertexNormalsOfTriangles(sphere1.vertices, normalsSphere);
     sphere1.SetNormals(normalsSphere);
 
@@ -253,12 +266,16 @@ bool initializeVertexbuffer()
             sphere1UVBuffer.emplace_back(u, v);
         }
     }
-  sphere1.SetTexture(sphere1UVBuffer, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\ball-texture.bmp)");
+  sphere1.SetTexture(sphere1UVBuffer, R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\ball-texture.bmp)");*/
 
 
   sphere2 = RenderingObject();
   sphere2.InitializeVAO();
   sphere2.LoadSTLSphere(R"(C:\Users\slama\CLionProjects\OpenGL-Template\3dproj4\playground\Sphere.stl)");
+
+  sphere3 = RenderingObject();
+  sphere3.InitializeVAO();
+  sphere3.LoadSTLSphere("Sphere.stl");
 
 
   return true;

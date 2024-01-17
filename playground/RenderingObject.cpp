@@ -2,7 +2,7 @@
 #include "../common/texture.hpp"
 #include "parse_stl.h"
 
-RenderingObject::RenderingObject() {
+RenderingObject::RenderingObject(): texture_present(false), M(glm::mat4(1.0f)) {
 
 }
 
@@ -13,16 +13,15 @@ void RenderingObject::InitializeVAO()
   glGenVertexArrays(1, &VertexArrayID);
 }
 
-void RenderingObject::SetVertices(std::vector< glm::vec3 > verticesParam)
+void RenderingObject::SetVertices(std::vector< glm::vec3 > vertices)
 {
   glBindVertexArray(VertexArrayID);
   glGenBuffers(1, &vertexbuffer);
-  VertexBufferSize = verticesParam.size() * sizeof(glm::vec3);
+  VertexBufferSize = vertices.size() * sizeof(glm::vec3);
   glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-  glBufferData(GL_ARRAY_BUFFER, VertexBufferSize, &verticesParam[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, VertexBufferSize, &vertices[0], GL_STATIC_DRAW);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-  vertices = verticesParam;
 }
 
 void RenderingObject::SetNormals(std::vector< glm::vec3 > normals)
