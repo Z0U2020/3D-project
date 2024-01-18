@@ -3,15 +3,13 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <vector>
-#include <string>
-#include "parse_stl.h"
-#include "glm/gtc/matrix_transform.hpp"
+#include "playground/parse_stl.h"
 
 
 class RenderingObject
 {
 public:
-    RenderingObject();
+	RenderingObject();
 	virtual ~RenderingObject();
 
   void InitializeVAO();
@@ -40,7 +38,6 @@ public:
 
   //Model matrix: moves object from model to world space
   glm::mat4 M;
-  glm::vec3 color;
 
   /**
   * Computes the normals of triangles by computing the cross product.
@@ -49,13 +46,11 @@ public:
   */
   void computeVertexNormalsOfTriangles(std::vector< glm::vec3 >& vertices, std::vector< glm::vec3 >& normals);
 
-    void LoadSTLSphere(std::string stl_file_name);
-
 protected:
 
   std::vector<glm::vec3> getAllTriangleNormalsForVertex(stl::point vertex, std::vector<stl::triangle> triangles);
   glm::vec3 computeMeanVector(std::vector<glm::vec3>);
-
+  
 
 };
 

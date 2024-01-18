@@ -1,6 +1,6 @@
 # CMake entry point
 cmake_minimum_required (VERSION 3.0)
-project (Fractals)
+project (OpenGL-Template)
 
 find_package(OpenGL REQUIRED)
 
@@ -36,6 +36,7 @@ include_directories(
 	external/glfw-3.1.2/include/GLFW/
 	external/glm-0.9.7.1/
 	external/glew-1.13.0/include/
+	.
 )
 
 set(ALL_LIBS
@@ -58,14 +59,15 @@ add_executable(playground
 	playground/playground.h
 	playground/SimpleFragmentShader.fragmentshader
 	playground/SimpleVertexShader.vertexshader
+
 	common/shader.cpp
 	common/shader.hpp
-	playground/parse_stl.h
+	common/texture.cpp
+	common/texture.hpp
+
 	playground/parse_stl.cpp
+
 	playground/RenderingObject.cpp
-	playground/RenderingObject.h
-		common/texture.cpp
-		common/texture.hpp
 )
 target_link_libraries(playground
 	${ALL_LIBS}

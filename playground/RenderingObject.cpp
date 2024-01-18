@@ -1,11 +1,11 @@
 #include "RenderingObject.h"
-#include "../common/texture.hpp"
-#include "parse_stl.h"
+#include <common/texture.hpp>
 
-RenderingObject::RenderingObject(): texture_present(false), M(glm::mat4(1.0f)) {
 
+RenderingObject::RenderingObject() : texture_present(false), M(glm::mat4(1.0f))
+{
+  
 }
-
 RenderingObject::~RenderingObject() {}
 
 void RenderingObject::InitializeVAO()
@@ -137,35 +137,6 @@ void RenderingObject::LoadSTL(std::string stl_file_name)
   computeVertexNormalsOfTriangles(vertices, normals);
   this->SetNormals(normals);
 
-}
-
-void RenderingObject::LoadSTLSphere(std::string stl_file_name)
-{
-    // Load stl file and construct vertex buffer
-    auto info = stl::parse_stl(stl_file_name);
-    std::vector<stl::triangle> triangles = info.triangles;
-    std::vector<glm::vec3> vertices;
-    std::vector<glm::vec3> normals;
-
-    // Calculate centroid of the vertices
-    glm::vec3 centroid(0.0f, 0.0f, 0.0f);
-    for (auto t : info.triangles) {
-        vertices.push_back(glm::vec3(t.v1.x, t.v1.y, t.v1.z));
-        vertices.push_back(glm::vec3(t.v2.x, t.v2.y, t.v2.z));
-        vertices.push_back(glm::vec3(t.v3.x, t.v3.y, t.v3.z));
-
-        centroid += vertices.back();
-    }
-    centroid /= static_cast<float>(vertices.size());
-
-    // Translate the vertices to center the object around the origin
-    for (auto& vertex : vertices) {
-        vertex -= centroid;
-    }
-
-    this->SetVertices(vertices);
-    computeVertexNormalsOfTriangles(vertices, normals);
-    this->SetNormals(normals);
 }
 
 std::vector<glm::vec3> RenderingObject::getAllTriangleNormalsForVertex(stl::point vertex, std::vector<stl::triangle> triangles)
